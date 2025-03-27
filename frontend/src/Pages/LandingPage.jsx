@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { VscHome, VscArchive, VscAccount, VscSettingsGear } from 'react-icons/vsc';
 import TextPressure from '../Components/TextPressure';
 import '../Styles/landingPage.css';
@@ -7,10 +8,11 @@ import logo from '../assets/uno-logo.png';
 import Dock from '../Components/Navbar';
 
 const UnoArena = () => {
+  const navigate = useNavigate();
   const subtext = "Play your cards right... or blame the deck!";
   const items = [
-    { icon: <VscHome size={28} />, label: 'Home', onClick: () => {} },
-    { icon: <VscArchive size={28} />, label: 'BulePrint', onClick: () => {} },
+    { icon: <VscHome size={28} />, label: 'Home', onClick: () => navigate('/') },
+    { icon: <VscArchive size={28} />, label: 'BulePrint', onClick: () => navigate('/BluePrint') },
     { icon: <VscAccount size={28} />, label: 'Login', onClick: () => {} },
     { icon: <VscSettingsGear size={28} />, label: 'Settings', onClick: () => {} },
   ];
