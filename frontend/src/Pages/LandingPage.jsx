@@ -13,7 +13,7 @@ const UnoArena = () => {
   const items = [
     { icon: <VscHome size={28} />, label: 'Home', onClick: () => navigate('/') },
     { icon: <VscArchive size={28} />, label: 'BulePrint', onClick: () => navigate('/BluePrint') },
-    { icon: <VscAccount size={28} />, label: 'Login', onClick: () => {} },
+    { icon: <VscAccount size={28} />, label: 'Login', onClick: () => navigate('/signup') },
     { icon: <VscSettingsGear size={28} />, label: 'Settings', onClick: () => {} },
   ];
 

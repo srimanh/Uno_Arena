@@ -22,7 +22,7 @@
   justify-content: center;
   align-items: center;
   gap: 20px;
-  margin-top: -40px;
+  margin-top: 30px;
 }
 
 .logo-container {
@@ -38,6 +38,8 @@
 .logo-image {
   width: 40px;
   height: 40px;
+  position: relative;
+  bottom: 20px;
   animation: rotateLogo 2s ease-in-out infinite;
 }
 
@@ -48,6 +50,8 @@
   animation: glowText 2s ease-in-out infinite;
   text-transform: uppercase;
   letter-spacing: 2px;
+  position: relative;
+  bottom: 20px;
 }
 
 .headline {
@@ -69,7 +73,7 @@
   display: flex;
   justify-content: center;
   gap: 0.2em;
-  margin-top: -20px;
+  margin-top: 70px;
 }
 
 .subtext-char {
@@ -261,6 +265,7 @@
 
 .text-pressure-container {
   position: relative;
+  top: 10px; 
   bottom: 100px;
   height: 200px;
   display: flex;
