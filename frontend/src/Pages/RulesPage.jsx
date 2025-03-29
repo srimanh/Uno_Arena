@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState } from 'react';
+
 import { useNavigate } from 'react-router-dom';
 import { VscHome, VscArchive, VscAccount, VscSettingsGear } from 'react-icons/vsc';
 import '../Styles/landingPage.css';
@@ -12,7 +12,7 @@ const RulesPage = () => {
   const items = [
     { icon: <VscHome size={28} />, label: 'Home', onClick: () => navigate('/') },
     { icon: <VscArchive size={28} />, label: 'BluePrint', onClick: () => navigate('/BluePrint') },
-    { icon: <VscAccount size={28} />, label: 'Login', onClick: () => {} },
+    { icon: <VscAccount size={28} />, label: 'Login', onClick: () => navigate('/signup') },
     { icon: <VscSettingsGear size={28} />, label: 'Settings', onClick: () => {} },
   ];
 
