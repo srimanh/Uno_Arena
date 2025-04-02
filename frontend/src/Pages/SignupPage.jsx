@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { VscHome, VscArchive, VscAccount, VscSettingsGear } from 'react-icons/vsc';
+import { VscHome, VscArchive, VscAccount, VscSettingsGear, VscSignOut } from 'react-icons/vsc';
 import '../Styles/landingPage.css';
 import '../Styles/signupPage.css';
 import logo from '../assets/uno-logo.png';
@@ -25,21 +25,15 @@ const SignupPage = () => {
   const handleSignup = async () => {
     try {
       let requestBody = {};
-  
+
       if (username && password) {
-        // Normal signup flow
-        requestBody = {
-          username,
-          password,
-          googleAuth: false, // Indicating it's a normal signup
-        };
+        requestBody = { username, password, googleAuth: false };
       } else {
-        // Google signup flow
         if (!window.googleUser) {
           alert('Google authentication failed. Please try again.');
           return;
         }
-  
+
         requestBody = {
           googleAuth: true,
           email: window.googleUser.email,
@@ -47,37 +41,41 @@ const SignupPage = () => {
           profileImage: window.googleUser.picture,
         };
       }
-  
+
       const response = await fetch('http://localhost:5001/api/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
-  
+
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Signup Error:', errorText);
         alert(`Signup Failed: ${errorText}`);
         return;
       }
-  
+
       const data = await response.json();
-      console.log('Signup Successful:', data);
+      localStorage.setItem('token', data.token);
+      document.dispatchEvent(new Event('loginStatusChanged'));
       alert('Signup Successful!');
-      navigate('/'); // Redirect on success
+      navigate('/');
     } catch (error) {
-      console.error('Signup Error:', error);
       alert('Something went wrong. Please try again.');
+      console.error('Error during signup:', error);
     }
   };
-  
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    document.dispatchEvent(new Event('loginStatusChanged'));
+    navigate('/signup');
+  };
+
   const items = [
     { icon: <VscHome size={28} />, label: 'Home', onClick: () => navigate('/') },
     { icon: <VscArchive size={28} />, label: 'BluePrint', onClick: () => navigate('/BluePrint') },
-    { icon: <VscAccount size={28} />, label: 'Login', onClick: () => navigate('/signup') },
-    { icon: <VscSettingsGear size={28} />, label: 'Settings', onClick: () => {} },
+    { icon: localStorage.getItem('token') ? <VscSignOut size={28} /> : <VscAccount size={28} />, label: localStorage.getItem('token') ? 'Logout' : 'Login', onClick: localStorage.getItem('token') ? handleLogout : () => navigate('/signup') },
+    { icon: <VscSettingsGear size={28} />, label: 'Game', onClick: () => navigate('/game') },
   ];
 
   return (
