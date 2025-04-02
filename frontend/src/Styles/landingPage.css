@@ -292,3 +292,23 @@
 .dock-wrapper > * {
   pointer-events: auto;
 }
+
+.logout-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.logout-btn:hover {
+  background-color: #d63031;
+}
