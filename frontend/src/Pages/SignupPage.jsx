@@ -47,15 +47,15 @@ const SignupPage = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody),
       });
-
+  
       if (!response.ok) {
         const errorText = await response.text();
         alert(`Signup Failed: ${errorText}`);
         return;
       }
-
+  
       const data = await response.json();
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('token', data.token); // Ensure token is stored
       document.dispatchEvent(new Event('loginStatusChanged'));
       alert('Signup Successful!');
       navigate('/');
