@@ -166,6 +166,7 @@
   top: 10px;
   animation: popIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  transform: rotate(90deg);
 }
 
 .blueprint-heading:hover {

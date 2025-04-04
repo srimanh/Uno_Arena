@@ -422,3 +422,56 @@ p {
     transform: translateY(0);
   }
 }
+
+/* Add these to your landingPage.css file */
+
+.copy-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.3s;
+}
+
+.copy-btn:hover {
+  background-color: #45a049;
+}
+
+.room-code-display {
+  font-size: 24px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  color: #ff5722;
+}
+
+.modal-content input {
+  padding: 10px;
+  margin: 10px 0;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.auth-processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.auth-processing h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.auth-processing p {
+  color: #666;
+}

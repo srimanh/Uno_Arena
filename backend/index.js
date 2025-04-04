@@ -41,6 +41,9 @@ require('./auth/googleAuth');
 app.use('/api/auth', authRoutes); // Ensure this is correctly mounted
 app.use('/api', routes); // Ensure this is correctly mounted
 
+const roomRoutes = require('./routes/roomRoutes'); // Import room routes
+app.use('/api/rooms', roomRoutes); // Register route
+
 // Root route
 app.get('/', (req, res) => {
   res.send('UNO Backend is running!');

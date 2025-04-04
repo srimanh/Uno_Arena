@@ -16,7 +16,7 @@ const UnoArena = () => {
   const [roomSize, setRoomSize] = useState(4);
   const [roomCode, setRoomCode] = useState('');
   const [inputRoomCode, setInputRoomCode] = useState('');
-  const [players, setPlayers] = useState([]);
+  // const [players, setPlayers] = useState([]);
 
   useEffect(() => {
     const checkLoginStatus = () => {
@@ -42,40 +42,97 @@ const UnoArena = () => {
     document.dispatchEvent(new Event('loginStatusChanged'));
   };
 
-  const generateRoomCode = () => {
-    const randomCode = Math.random().toString(36).substr(2, 6).toUpperCase();
-    setRoomCode(randomCode);
-    localStorage.setItem('roomCode', randomCode); // Store in localStorage
-    setPlayers([]);
-  };
-  
+  const generateRoomCode = async () => {
+    try {
+      
+      const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase(); // 6-char code
+      const token = localStorage.getItem('token');
+      let userId;
+try {
+  const base64Url = token.split('.')[1];
+  if (!base64Url) throw new Error('Invalid token format.');
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  ).join(''));
+  const payload = JSON.parse(jsonPayload);
+  userId = payload.userId;
+} catch (err) {
+  console.error('Invalid token:', err);
+  alert('Invalid login session. Please log in again.');
+  navigate('/signup');
+  return;
+}
 
-  const handleJoinRoom = () => {
-    const storedRoomCode = localStorage.getItem('roomCode'); // Retrieve stored code
-    console.log("Stored Room Code:", storedRoomCode); // Debugging
-    console.log("Entered Room Code:", inputRoomCode); // Debugging
   
-    if (inputRoomCode === storedRoomCode) {
-      if (players.length + 1 < roomSize) {
-        setPlayers((prevPlayers) => {
-          const updatedPlayers = [...prevPlayers, `Player ${prevPlayers.length + 1}`];
-          localStorage.setItem('players', JSON.stringify(updatedPlayers)); // Store players in localStorage
-          return updatedPlayers;
-        });
-      } else if (players.length + 1 === roomSize) {
-        setPlayers((prevPlayers) => {
-          const updatedPlayers = [...prevPlayers, `Player ${prevPlayers.length + 1}`];
-          localStorage.setItem('players', JSON.stringify(updatedPlayers));
-          navigate('/game'); // Redirect when the last player joins
-          return updatedPlayers;
-        });
+      const response = await fetch('http://localhost:5001/api/rooms/create-room', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' , Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          code: roomCode,
+          roomSize,
+          playerIds: [userId],
+        }),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        setRoomCode(data.room.code); // or setRoomCode(roomCode);
       } else {
-        alert('Room is full!');
+        alert(data.msg || data.error || 'Failed to create room.');
       }
-    } else {
-      alert('Invalid room code!');
+    } catch (error) {
+      console.error('Error creating room:', error);
     }
   };
+  
+  const handleJoinRoom = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('User not logged in');
+        return;
+      }
+  
+      let userId;
+try {
+  const base64Url = token.split('.')[1];
+  if (!base64Url) throw new Error('Invalid token format.');
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(c =>
+    '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  ).join(''));
+  const payload = JSON.parse(jsonPayload);
+  userId = payload.userId;
+} catch (err) {
+  console.error('Invalid token:', err);
+  alert('Invalid login session. Please log in again.');
+  navigate('/signup');
+  return;
+}
+
+  
+      const response = await fetch('http://localhost:5001/api/rooms/join-room', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId, roomCode: inputRoomCode }),
+      });
+  
+      const data = await response.json();
+      if (response.ok) {
+        navigate('/game');
+      } else {
+        alert(data.error);
+      }
+    } catch (error) {
+      console.error('Error joining room:', error);
+    }
+  };
+  
 
   const handleStartClick = () => {
     if (!isLoggedIn) {
@@ -171,13 +228,17 @@ const UnoArena = () => {
         </div>
       )}
 
-      {showJoinModal && (
+{showJoinModal && (
         <div className="modal-overlay" onClick={() => setShowJoinModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h2>Enter Room Code</h2>
-            <input type="text" value={inputRoomCode} onChange={(e) => setInputRoomCode(e.target.value)} />
-            <button onClick={handleJoinRoom}>Start</button>
-            <button onClick={() => setShowJoinModal(false)}>Close</button>
+            <h2>Join Room</h2>
+            <input
+              type="text"
+              placeholder="Enter Room Code"
+              value={inputRoomCode}
+              onChange={(e) => setInputRoomCode(e.target.value)}
+            />
+            <button onClick={handleJoinRoom}>Join</button>
           </div>
         </div>
       )}

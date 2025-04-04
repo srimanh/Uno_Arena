@@ -11,20 +11,20 @@ router.post('/signup', async (req, res) => {
         const { username, password, googleAuth } = req.body;
 
         if (googleAuth) {
-            // Google authentication flow
-            const { email, username, profileImage } = req.body;
+            const { email, name, profileImage } = req.body;
             let user = await User.findOne({ username: email });
 
             if (user) return res.status(400).json({ msg: 'User already exists' });
 
-            // If not found, create a new user with Google data (no password required)
             user = new User({ username: email, profileImage: profileImage || '', password: '' });
 
             await user.save();
-            return res.status(201).json({ msg: 'User registered successfully with Google Auth' });
+
+            const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+            return res.status(201).json({ token, user: { username: user.username } });
         }
 
-        // Normal signup flow (with username and password)
         let user = await User.findOne({ username });
 
         if (user) return res.status(400).json({ msg: 'Username already taken' });
@@ -33,8 +33,11 @@ router.post('/signup', async (req, res) => {
         user = new User({ username, password: hashedPassword });
 
         await user.save();
-        res.status(201).json({ msg: 'User registered successfully' });
 
+        // ✅ Generate and return token here
+        const token = jwt.sign({ userId: user._id, username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+        res.status(201).json({ token, user: { username: user.username } });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -49,12 +52,13 @@ router.post('/login', async (req, res) => {
 
         if (!user) return res.status(400).json({ msg: 'Invalid credentials' });
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
+const isMatch = await bcrypt.compare(password, user.password);
+if (!isMatch) return res.status(400).json({ msg: 'Invalid credentials' });
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+const token = jwt.sign({ userId: user._id , username: user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        res.json({ token, user: { username: user.username } });
+res.json({ token, user: { username: user.username } });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
