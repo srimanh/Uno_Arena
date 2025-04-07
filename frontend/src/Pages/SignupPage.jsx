@@ -14,56 +14,67 @@ const SignupPage = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleImageUpload = (event) => {
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+  
+  const handleImageUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setProfileImage(imageUrl);
+      const base64 = await convertToBase64(file);
+      setProfileImage(base64);
     }
   };
-
-  const handleSignup = async () => {
-    try {
-      let requestBody = {};
-
-      if (username && password) {
-        requestBody = { username, password, googleAuth: false };
-      } else {
-        if (!window.googleUser) {
-          alert('Google authentication failed. Please try again.');
-          return;
-        }
-
-        requestBody = {
-          googleAuth: true,
-          email: window.googleUser.email,
-          name: window.googleUser.name,
-          profileImage: window.googleUser.picture,
-        };
-      }
-
-      const response = await fetch('http://localhost:5001/api/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-      });
   
-      if (!response.ok) {
-        const errorText = await response.text();
-        alert(`Signup Failed: ${errorText}`);
+
+ const handleSignup = async () => {
+  try {
+    let requestBody = {};
+
+    if (username && password) {
+      requestBody = { username, password, googleAuth: false, profileImage };
+    } else {
+      if (!window.googleUser) {
+        alert('Google authentication failed. Please try again.');
         return;
       }
-  
-      const data = await response.json();
-      localStorage.setItem('token', data.token); // Ensure token is stored
-      document.dispatchEvent(new Event('loginStatusChanged'));
-      alert('Signup Successful!');
-      navigate('/');
-    } catch (error) {
-      alert('Something went wrong. Please try again.');
-      console.error('Error during signup:', error);
+
+      requestBody = {
+        googleAuth: true,
+        email: window.googleUser.email,
+        name: window.googleUser.name,
+        profileImage: window.googleUser.picture,
+      };
     }
-  };
+
+    const response = await fetch('http://localhost:5001/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      alert(`Signup Failed: ${errorText}`);
+      return;
+    }
+
+    const data = await response.json();
+    localStorage.setItem('token', data.token);
+    document.dispatchEvent(new Event('loginStatusChanged'));
+    alert('Signup Successful!');
+    navigate('/');
+  } catch (error) {
+    alert('Something went wrong. Please try again.');
+    console.error('Error during signup:', error);
+  }
+};
+
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -75,7 +86,8 @@ const SignupPage = () => {
     { icon: <VscHome size={28} />, label: 'Home', onClick: () => navigate('/') },
     { icon: <VscArchive size={28} />, label: 'BluePrint', onClick: () => navigate('/BluePrint') },
     { icon: localStorage.getItem('token') ? <VscSignOut size={28} /> : <VscAccount size={28} />, label: localStorage.getItem('token') ? 'Logout' : 'Login', onClick: localStorage.getItem('token') ? handleLogout : () => navigate('/signup') },
-    { icon: <VscSettingsGear size={28} />, label: 'Game', onClick: () => navigate('/game') },
+    // eslint-disable-next-line no-undef
+    { icon: <VscSettingsGear size={28} />, label: 'Game', onClick: () => navigate(`/game/${roomCode}`) },
   ];
 
   return (

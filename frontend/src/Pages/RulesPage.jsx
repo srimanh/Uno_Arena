@@ -13,7 +13,8 @@ const RulesPage = () => {
     { icon: <VscHome size={28} />, label: 'Home', onClick: () => navigate('/') },
     { icon: <VscArchive size={28} />, label: 'BluePrint', onClick: () => navigate('/BluePrint') },
     { icon: <VscAccount size={28} />, label: 'Login', onClick: () => navigate('/signup') },
-    { icon: <VscSettingsGear size={28} />, label: 'game', onClick: () => navigate('/game') },
+    // eslint-disable-next-line no-undef
+    { icon: <VscSettingsGear size={28} />, label: 'game', onClick: () => navigate(`/game/${roomCode}`) },
   ];
 
   const rulesData = [

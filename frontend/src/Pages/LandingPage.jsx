@@ -124,7 +124,8 @@ try {
   
       const data = await response.json();
       if (response.ok) {
-        navigate('/game');
+        navigate(`/game/${inputRoomCode}`);
+        setShowJoinModal(false);
       } else {
         alert(data.error);
       }
@@ -157,7 +158,7 @@ try {
     isLoggedIn
       ? { icon: <VscSignOut size={28} />, label: 'Logout', onClick: handleLogout }
       : { icon: <VscAccount size={28} />, label: 'Login', onClick: () => navigate('/signup') },
-    { icon: <VscSettingsGear size={28} />, label: 'Game', onClick: () => navigate('/game') },
+    { icon: <VscSettingsGear size={28} />, label: 'Game', onClick: () => navigate(`/game/${roomCode}`) },
   ];
 
   return (

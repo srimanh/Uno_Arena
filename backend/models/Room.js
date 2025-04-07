@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const RoomSchema = new mongoose.Schema({
+const roomSchema = new Schema({
   code: { type: String, required: true, unique: true },
   roomSize: { type: Number, required: true },
-  players: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  players: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
-
-module.exports = mongoose.model('Room', RoomSchema);
+module.exports = mongoose.model('Room', roomSchema);
