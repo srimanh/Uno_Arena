@@ -3,53 +3,54 @@ const cors = require('cors');
 const connectDB = require('./db/database');
 const passport = require('passport');
 const session = require('express-session');
-const authRoutes = require('./routes/authRoutes'); // Correct path for auth routes
-const routes = require('./routes/auth'); // Ensure this is the correct path for your routes
+const authRoutes = require('./routes/authRoutes'); // Google OAuth Routes
+const routes = require('./routes/auth');           // Local signup/login routes
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to the database
+// Connect to MongoDB
 connectDB();
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:5173", // Ensure this matches your frontend URL
+  origin: "http://localhost:5173", // Frontend URL
   credentials: true
 }));
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true }));
+
+// Proper JSON & URL-Encoded body limit to handle large payloads
+app.use(express.json({ limit: '55mb' }));
+app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 
 // Session Middleware for persistent login
 app.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SESSION_SECRET || 'defaultSecret',
     resave: false,
     saveUninitialized: true,
   })
 );
 
-// Passport Middleware
+// Passport Configuration
 app.use(passport.initialize());
 app.use(passport.session());
+require('./auth/googleAuth'); // Google OAuth strategy
 
-// Google Auth Configuration
-require('./auth/googleAuth');
+// Routes
+app.use('/api/auth', authRoutes); // Google Auth Routes
+app.use('/api', routes);          // Local Signup/Login Routes
 
-// API Routes
-app.use('/api/auth', authRoutes); // Ensure this is correctly mounted
-app.use('/api', routes); // Ensure this is correctly mounted
+// Room Routes
+const roomRoutes = require('./routes/roomRoutes');
+app.use('/api/rooms', roomRoutes);
 
-const roomRoutes = require('./routes/roomRoutes'); // Import room routes
-app.use('/api/rooms', roomRoutes); // Register route
-
-// Root route
+// Root Route
 app.get('/', (req, res) => {
   res.send('UNO Backend is running!');
 });
 
-// Server
+// Start Server
 app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`✅ Server running at http://localhost:${PORT}`);
 });
